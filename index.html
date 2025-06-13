@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Cartillas de Bingo</title>
+    <!-- CDN para html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #F6F8FB;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #9233EA, #4F45E5);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            background: #fafbfc;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed #CBD5E1;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #2980b9;
+            background: #ecf0f1;
+        }
+
+        .upload-area.dragover {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .upload-text {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-generate {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-generate:hover {
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .image-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .image-item:hover {
+            transform: scale(1.05);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .remove-img {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .grid-selector label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .grid-selector select {
+            padding: 10px 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .bingo-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .bingo-card {
+            background: white;
+            border: 3px solid #2c3e50;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+
+        .bingo-card h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: -20px -20px 20px -20px;
+        }
+
+        .bingo-grid {
+            display: grid;
+            gap: 3px;
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .bingo-cell {
+            aspect-ratio: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .bingo-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .individual-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .individual-image {
+            background: white;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+
+        .individual-image img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .individual-image h4 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .status {
+            background: #d5f4e6;
+            color: #27ae60;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+
+        /* Estilos específicos para PDF */
+        .pdf-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            padding: 20mm;
+            box-sizing: border-box;
+            background: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .pdf-bingo-card {
+            width: 100%;
+            height: calc(297mm - 40mm);
+            margin: 0;
+            padding: 0;
+            border: 3px solid #2c3e50;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            page-break-after: always;
+            box-sizing: border-box;
+        }
+
+        .pdf-bingo-card h3 {
+            font-size: 2.5rem;
+            color: white;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            padding: 20px;
+            margin: 0 0 20px 0;
+            border-radius: 10px;
+            text-align: center;
+            width: calc(100% - 40px);
+        }
+
+        .pdf-bingo-grid {
+            flex: 1;
+            display: grid;
+            gap: 4px;
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 4px;
+            width: calc(100% - 40px);
+            max-height: calc(100% - 120px);
+        }
+
+        .pdf-bingo-cell {
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-bingo-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pdf-images-page {
+            width: 210mm;
+            height: 297mm;
+            padding: 20mm;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10mm;
+            background: white;
+            page-break-after: always;
+        }
+
+        .pdf-individual-image {
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            padding: 10mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .pdf-individual-image img {
+            width: 100%;
+            height: 70%;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 5mm;
+        }
+
+        .pdf-individual-image h4 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin: 0;
+        }
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Ocultar elementos de interfaz */
+            .header, 
+            .section:not(.print-section),
+            .controls,
+            .upload-area,
+            .grid-selector,
+            .status {
+                display: none !important;
+            }
+            
+            /* Mostrar solo las secciones de impresión */
+            .print-section {
+                display: block !important;
+                padding: 0;
+                margin: 0;
+                border: none;
+                background: white;
+            }
+            
+            /* Una cartilla por página A4 */
+            .bingo-card {
+                page-break-after: always;
+                page-break-inside: avoid;
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                padding: 20px;
+                border: 3px solid #2c3e50;
+                border-radius: 15px;
+                box-shadow: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            
+            .bingo-card:last-child {
+                page-break-after: avoid;
+            }
+            
+            .bingo-card h3 {
+                font-size: 2rem;
+                margin: 0 0 30px 0;
+                padding: 20px;
+                text-align: center;
+            }
+            
+            .bingo-grid {
+                flex: 1;
+                display: grid;
+                gap: 4px;
+                background: #2c3e50;
+                border-radius: 10px;
+                padding: 4px;
+                max-height: calc(100vh - 150px);
+            }
+            
+            .bingo-cell {
+                background: white;
+                border-radius: 5px;
+            }
+            
+            .bingo-cell img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            /* 4 imágenes individuales por página A4 */
+            .individual-images {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                gap: 20px;
+                width: 100vw;
+                height: 100vh;
+                padding: 20px;
+                box-sizing: border-box;
+                page-break-after: always;
+            }
+            
+            .individual-images:last-child {
+                page-break-after: avoid;
+            }
+            
+            .individual-image {
+                border: 2px solid #2c3e50;
+                border-radius: 10px;
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-shadow: none;
+                margin: 0;
+                page-break-inside: avoid;
+            }
+            
+            .individual-image img {
+                width: 100%;
+                height: 70%;
+                object-fit: cover;
+                border-radius: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .individual-image h4 {
+                font-size: 1.5rem;
+                margin: 0;
+                text-align: center;
+                height: 30%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Ocultar elementos específicos en impresión */
+            .print-controls {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .content {
+                padding: 20px;
+            }
+            .section {
+                padding: 20px;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Generador de Cartillas de Bingo</h1>
+            <p>Crea cartillas de bingo personalizadas con tus propias imágenes</p>
+        </div>
+
+        <div class="content">
+            <!-- Sección de subida de imágenes -->
+            <div class="section">
+                <h2>📸 Subir Imágenes</h2>
+                <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                    <div class="upload-text">
+                        Haz clic aquí o arrastra imágenes para subirlas<br>
+                        <small>Soporta: JPG, PNG, GIF, WEBP</small>
+                    </div>
+                    <button type="button" class="btn">Seleccionar Imágenes</button>
+                </div>
+                <input type="file" id="imageInput" multiple accept="image/*">
+                
+                <div id="imagesPreview" class="images-preview"></div>
+                <div id="imageStatus"></div>
+            </div>
+
+            <!-- Configuración de la cuadrícula -->
+            <div class="section">
+                <h2>⚙️ Configuración</h2>
+                <div class="grid-selector">
+                    <label for="gridRows">Filas:</label>
+                    <select id="gridRows">
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5" selected>5</option>
+                        <option value="6">6</option>
+                    </select>
+                    
+                    <label for="gridCols">Columnas:</label>
+                    <select id="gridCols">
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5" selected>5</option>
+                        <option value="6">6</option>
+                    </select>
+                    
+                    <label for="numCards">Cartillas a generar:</label>
+                    <select id="numCards">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="4" selected>4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Controles -->
+            <div class="section">
+                <h2>🎮 Controles</h2>
+                <div class="controls">
+                    <button class="btn btn-generate" onclick="generateBingo()">🎯 Generar Cartillas</button>
+                    <button class="btn btn-danger" onclick="clearAll()">🗑️ Limpiar Todo</button>
+                    <button class="btn" onclick="downloadCardsPDF()">📄 Descargar Cartillas PDF</button>
+                    <button class="btn" onclick="downloadImagesPDF()">🖼️ Descargar Imágenes PDF</button>
+                    <button class="btn" onclick="downloadAllPDF()">📋 Descargar Todo PDF</button>
+                </div>
+            </div>
+
+            <!-- Cartillas generadas -->
+            <div class="section print-section bingo-section" id="bingoSection" style="display: none;">
+                <h2>🎲 Cartillas de Bingo</h2>
+                <div id="bingoCards" class="bingo-cards"></div>
+            </div>
+
+            <!-- Imágenes individuales -->
+            <div class="section print-section individual-section" id="individualSection" style="display: none;">
+                <h2>🖼️ Imágenes Individuales</h2>
+                <div id="individualImages" class="individual-images"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImages = [];
+        let usedImages = [];
+
+        // Configurar eventos
+        document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+        
+        // Configurar drag & drop
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+
+        function handleImageUpload(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length === 0) {
+                showStatus('Por favor selecciona archivos de imagen válidos.', 'error');
+                return;
+            }
+
+            imageFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = {
+                        src: e.target.result,
+                        name: file.name
+                    };
+                    uploadedImages.push(imageData);
+                    updateImagePreview();
+                    showStatus(`${uploadedImages.length} imagen(es) subida(s) correctamente.`, 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateImagePreview() {
+            const preview = document.getElementById('imagesPreview');
+            preview.innerHTML = '';
+
+            uploadedImages.forEach((image, index) => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                imageItem.innerHTML = `
+                    <img src="${image.src}" alt="${image.name}" title="${image.name}">
+                    <button class="remove-img" onClick="removeImage(${index})" title="Eliminar imagen">×</button>
+                `;
+                preview.appendChild(imageItem);
+            });
+        }
+
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImagePreview();
+            showStatus(`Imagen eliminada. ${uploadedImages.length} imagen(es) restante(s).`, 'success');
+        }
+
+        function showStatus(message, type = 'success') {
+            const status = document.getElementById('imageStatus');
+            status.innerHTML = `<div class="status ${type === 'error' ? 'error' : ''}">${message}</div>`;
+            setTimeout(() => {
+                status.innerHTML = '';
+            }, 3000);
+        }
+
+        function generateBingo() {
+            if (uploadedImages.length === 0) {
+                showStatus('Primero debes subir algunas imágenes.', 'error');
+                return;
+            }
+
+            const rows = parseInt(document.getElementById('gridRows').value);
+            const cols = parseInt(document.getElementById('gridCols').value);
+            const numCards = parseInt(document.getElementById('numCards').value);
+            const cellsPerCard = rows * cols;
+
+            if (uploadedImages.length < cellsPerCard) {
+                showStatus(`Necesitas al menos ${cellsPerCard} imágenes para una cuadrícula de ${rows}x${cols}.`, 'error');
+                return;
+            }
+
+            // Generar cartillas
+            generateBingoCards(rows, cols, numCards);
+            
+            // Generar imágenes individuales
+            generateIndividualImages();
+
+            // Mostrar secciones
+            document.getElementById('bingoSection').style.display = 'block';
+            document.getElementById('individualSection').style.display = 'block';
+
+            // Hacer scroll hacia las cartillas
+            document.getElementById('bingoSection').scrollIntoView({ behavior: 'smooth' });
+
+            showStatus(`¡${numCards} cartilla(s) de bingo generada(s) exitosamente!`, 'success');
+        }
+
+        function generateBingoCards(rows, cols, numCards) {
+            const container = document.getElementById('bingoCards');
+            container.innerHTML = '';
+            usedImages = [];
+
+            for (let cardNum = 1; cardNum <= numCards; cardNum++) {
+                const card = document.createElement('div');
+                card.className = 'bingo-card';
+                
+                const title = document.createElement('h3');
+                title.textContent = `BINGO - Cartilla ${cardNum}`;
+                card.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'bingo-grid';
+                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+                // Seleccionar imágenes aleatorias para esta cartilla
+                const cardImages = getRandomImages(rows * cols);
+                
+                cardImages.forEach(image => {
+                    const cell = document.createElement('div');
+                    cell.className = 'bingo-cell';
+                    cell.innerHTML = `<img src="${image.src}" alt="${image.name}">`;
+                    grid.appendChild(cell);
+                });
+
+                card.appendChild(grid);
+                container.appendChild(card);
+            }
+        }
+
+        function generateIndividualImages() {
+            const container = document.getElementById('individualImages');
+            container.innerHTML = '';
+
+            // Usar todas las imágenes que aparecieron en las cartillas
+            const uniqueImages = [...new Set(usedImages)];
+            
+            // Agrupar imágenes de 4 en 4 para impresión
+            for (let i = 0; i < uniqueImages.length; i += 4) {
+                const pageGroup = document.createElement('div');
+                pageGroup.className = 'individual-images';
+                
+                const pageImages = uniqueImages.slice(i, i + 4);
+                pageImages.forEach((image, index) => {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'individual-image';
+                    imageDiv.innerHTML = `
+                        <img src="${image.src}" alt="${image.name}">
+                        <h4>Imagen ${i + index + 1}</h4>
+                    `;
+                    pageGroup.appendChild(imageDiv);
+                });
+                
+                // Rellenar con divs vacíos si es necesario para mantener el grid
+                while (pageImages.length < 4) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'individual-image';
+                    emptyDiv.style.visibility = 'hidden';
+                    pageGroup.appendChild(emptyDiv);
+                    pageImages.push(null);
+                }
+                
+                container.appendChild(pageGroup);
+            }
+        }
+
+        function getRandomImages(count) {
+            const shuffled = [...uploadedImages].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, count);
+            
+            // Agregar a las imágenes usadas para la sección individual
+            selected.forEach(img => {
+                if (!usedImages.some(used => used.src === img.src)) {
+                    usedImages.push(img);
+                }
+            });
+            
+            return selected;
+        }
+
+        // Funciones de descarga PDF
+        async function downloadCardsPDF() {
+            if (document.getElementById('bingoCards').children.length === 0) {
+                showStatus('Primero debes generar las cartillas de bingo.', 'error');
+                return;
+            }
+
+            showStatus('Generando PDF de cartillas... Por favor espera.', 'success');
+
+            try {
+                // Crear contenedor temporal para PDF
+                const pdfContainer = createPDFCardsContainer();
+                document.body.appendChild(pdfContainer);
+
+                // Configuración para html2pdf
+                const options = {
+                    margin: 0,
+                    filename: 'cartillas-bingo.pdf',
+                    image: { 
+                        type: 'jpeg', 
+                        quality: 0.95 
+                    },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait' 
+                    },
+                    pagebreak: { 
+                        mode: ['avoid-all', 'css', 'legacy'] 
+                    }
+                };
+
+                await html2pdf().set(options).from(pdfContainer).save();
+                
+                // Limpiar contenedor temporal
+                document.body.removeChild(pdfContainer);
+                showStatus('¡PDF de cartillas descargado exitosamente!', 'success');
+
+            } catch (error) {
+                console.error('Error al generar PDF:', error);
+                showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'error');
+            }
+        }
+
+        async function downloadImagesPDF() {
+            if (usedImages.length === 0) {
+                showStatus('Primero debes generar las cartillas para obtener las imágenes.', 'error');
+                return;
+            }
+
+            showStatus('Generando PDF de imágenes... Por favor espera.', 'success');
+
+            try {
+                // Crear contenedor temporal para PDF
+                const pdfContainer = createPDFImagesContainer();
+                document.body.appendChild(pdfContainer);
+
+                const options = {
+                    margin: 0,
+                    filename: 'imagenes-bingo.pdf',
+                    image: { 
+                        type: 'jpeg', 
+                        quality: 0.95 
+                    },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait' 
+                    },
+                    pagebreak: { 
+                        mode: ['avoid-all', 'css', 'legacy'] 
+                    }
+                };
+
+                await html2pdf().set(options).from(pdfContainer).save();
+                
+                // Limpiar contenedor temporal
+                document.body.removeChild(pdfContainer);
+                showStatus('¡PDF de imágenes descargado exitosamente!', 'success');
+
+            } catch (error) {
+                console.error('Error al generar PDF:', error);
+                showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'error');
+            }
+        }
+
+        async function downloadAllPDF() {
+            if (document.getElementById('bingoCards').children.length === 0) {
+                showStatus('Primero debes generar las cartillas de bingo.', 'error');
+                return;
+            }
+
+            showStatus('Generando PDF completo... Por favor espera.', 'success');
+
+            try {
+                // Crear contenedor temporal combinado
+                const pdfContainer = document.createElement('div');
+                pdfContainer.style.position = 'absolute';
+                pdfContainer.style.left = '-9999px';
+                pdfContainer.style.top = '0';
+
+                // Agregar cartillas
+                const cardsContainer = createPDFCardsContainer();
+                pdfContainer.appendChild(cardsContainer);
+
+                // Agregar imágenes
+                const imagesContainer = createPDFImagesContainer();
+                pdfContainer.appendChild(imagesContainer);
+
+                document.body.appendChild(pdfContainer);
+
+                const options = {
+                    margin: 0,
+                    filename: 'bingo-completo.pdf',
+                    image: { 
+                        type: 'jpeg', 
+                        quality: 0.95 
+                    },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait' 
+                    },
+                    pagebreak: { 
+                        mode: ['avoid-all', 'css', 'legacy'] 
+                    }
+                };
+
+                await html2pdf().set(options).from(pdfContainer).save();
+                
+                // Limpiar contenedor temporal
+                document.body.removeChild(pdfContainer);
+                showStatus('¡PDF completo descargado exitosamente!', 'success');
+
+            } catch (error) {
+                console.error('Error al generar PDF:', error);
+                showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'error');
+            }
+        }
+
+        function createPDFCardsContainer() {
+            const container = document.createElement('div');
+            const cards = document.getElementById('bingoCards').children;
+            const rows = parseInt(document.getElementById('gridRows').value);
+            const cols = parseInt(document.getElementById('gridCols').value);
+
+            for (let i = 0; i < cards.length; i++) {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'pdf-container';
+
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'pdf-bingo-card';
+
+                const title = document.createElement('h3');
+                title.textContent = `BINGO - Cartilla ${i + 1}`;
+                cardDiv.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'pdf-bingo-grid';
+                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+                // Copiar imágenes de la cartilla original
+                const originalCells = cards[i].querySelectorAll('.bingo-cell img');
+                originalCells.forEach(img => {
+                    const cell = document.createElement('div');
+                    cell.className = 'pdf-bingo-cell';
+                    const newImg = document.createElement('img');
+                    newImg.src = img.src;
+                    newImg.alt = img.alt;
+                    cell.appendChild(newImg);
+                    grid.appendChild(cell);
+                });
+
+                cardDiv.appendChild(grid);
+                pageDiv.appendChild(cardDiv);
+                container.appendChild(pageDiv);
+            }
+
+            return container;
+        }
+
+        function createPDFImagesContainer() {
+            const container = document.createElement('div');
+            const uniqueImages = [...new Set(usedImages)];
+
+            // Agrupar imágenes de 4 en 4
+            for (let i = 0; i < uniqueImages.length; i += 4) {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'pdf-images-page';
+
+                const pageImages = uniqueImages.slice(i, i + 4);
+                pageImages.forEach((image, index) => {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'pdf-individual-image';
+                    
+                    const img = document.createElement('img');
+                    img.src = image.src;
+                    img.alt = image.name;
+                    
+                    const title = document.createElement('h4');
+                    title.textContent = `Imagen ${i + index + 1}`;
+                    
+                    imageDiv.appendChild(img);
+                    imageDiv.appendChild(title);
+                    pageDiv.appendChild(imageDiv);
+                });
+
+                container.appendChild(pageDiv);
+            }
+
+            return container;
+        }
+
+        function clearAll() {
+            if (confirm('¿Estás seguro de que quieres eliminar todas las imágenes y cartillas?')) {
+                uploadedImages = [];
+                usedImages = [];
+                document.getElementById('imagesPreview').innerHTML = '';
+                document.getElementById('bingoCards').innerHTML = '';
+                document.getElementById('individualImages').innerHTML = '';
+                document.getElementById('bingoSection').style.display = 'none';
+                document.getElementById('individualSection').style.display = 'none';
+                document.getElementById('imageInput').value = '';
+                showStatus('Todo ha sido eliminado correctamente.', 'success');
+            }
+        }
+
+        // Mensaje de bienvenida
+        window.addEventListener('load', () => {
+            showStatus('¡Bienvenido! Sube algunas imágenes para comenzar a crear tus cartillas de bingo.', 'success');
+        });
+    </script>
+</body>
+</html>
