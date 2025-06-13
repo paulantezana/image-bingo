@@ -61,7 +61,7 @@ function updateImagePreview() {
   const htmlContent = uploadedImages.map((image, index) => `
     <div class="image-item">
       <img src="${image.src}" alt="${image.name}" title="${image.name}">
-      <button class="remove-img" onClick="removeImage(${index})" title="Eliminar imagen">×</button>
+      <button class="remove-img dn-btn sm danger radio" onClick="removeImage(${index})" title="Eliminar imagen">×</button>
     </div>
   `).join('');
 

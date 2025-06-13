@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dn-theme-light">
 
 <head>
   <meta charset="UTF-8">
@@ -7,6 +7,7 @@
   <title>Generador de Cartillas de Bingo</title>
   <!-- CDN para html2pdf.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link rel="stylesheet" href="dnui.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -70,11 +71,11 @@
       <div class="section">
         <h2>🎮 Controles</h2>
         <div class="controls">
-          <button class="btn btn-generate" onclick="generateBingo()">🎯 Generar Cartillas</button>
-          <button class="btn btn-danger" onclick="clearAll()">🗑️ Limpiar Todo</button>
-          <button class="btn" onclick="downloadCardsPDF()">📄 Descargar Cartillas PDF</button>
-          <button class="btn" onclick="downloadImagesPDF()">🖼️ Descargar Imágenes PDF</button>
-          <button class="btn" onclick="downloadAllPDF()">📋 Descargar Todo PDF</button>
+          <button class="dn-btn lg primary" onclick="generateBingo()">🎯 Generar Cartillas</button>
+          <button class="dn-btn lg danger" onclick="clearAll()">🗑️ Limpiar Todo</button>
+          <button class="dn-btn lg" onclick="downloadCardsPDF()">📄 Descargar Cartillas PDF</button>
+          <button class="dn-btn lg" onclick="downloadImagesPDF()">🖼️ Descargar Imágenes PDF</button>
+          <button class="dn-btn lg" onclick="downloadAllPDF()">📋 Descargar Todo PDF</button>
         </div>
       </div>
 
