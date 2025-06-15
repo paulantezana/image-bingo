@@ -36,7 +36,7 @@ function processFiles(files) {
   const imageFiles = files.filter(file => file.type.startsWith('image/'));
 
   if (imageFiles.length === 0) {
-    showStatus('Por favor selecciona archivos de imagen válidos.', 'error');
+    showStatus('Por favor selecciona archivos de imagen válidos.', 'danger');
     return;
   }
 
@@ -61,7 +61,7 @@ function updateImagePreview() {
   const htmlContent = uploadedImages.map((image, index) => `
     <div class="image-item">
       <img src="${image.src}" alt="${image.name}" title="${image.name}">
-      <button class="remove-img dn-btn sm danger radio" onClick="removeImage(${index})" title="Eliminar imagen">×</button>
+      <button class="remove-img dn-btn sm danger circle" onClick="removeImage(${index})" title="Eliminar imagen">×</button>
     </div>
   `).join('');
 
@@ -76,7 +76,7 @@ function removeImage(index) {
 
 function showStatus(message, type = 'success') {
   const status = document.getElementById('imageStatus');
-  status.innerHTML = `<div class="status ${type === 'error' ? 'error' : ''}">${message}</div>`;
+  status.innerHTML = `<div class="dn-alert ${type === 'danger' ? 'danger' : 'success'}">${message}</div>`;
   setTimeout(() => {
     status.innerHTML = '';
   }, 3000);
@@ -84,7 +84,7 @@ function showStatus(message, type = 'success') {
 
 function generateBingo() {
   if (uploadedImages.length === 0) {
-    showStatus('Primero debes subir algunas imágenes.', 'error');
+    showStatus('Primero debes subir algunas imágenes.', 'danger');
     return;
   }
 
@@ -94,7 +94,7 @@ function generateBingo() {
   const cellsPerCard = rows * cols;
 
   if (uploadedImages.length < cellsPerCard) {
-    showStatus(`Necesitas al menos ${cellsPerCard} imágenes para una cuadrícula de ${rows}x${cols}.`, 'error');
+    showStatus(`Necesitas al menos ${cellsPerCard} imágenes para una cuadrícula de ${rows}x${cols}.`, 'danger');
     return;
   }
 
@@ -123,10 +123,12 @@ function generateBingoCards(rows, cols, numCards) {
     // Seleccionar imágenes aleatorias para esta cartilla
     const cardImages = getRandomImages(rows * cols);
 
+    // style="grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr);"
+    
     htmlContent += `
       <div class="bingo-card">
         <h3>BINGO - Cartilla ${cardNum}</h3>
-        <div class="bingo-grid" style="grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr);">
+        <div class="bingo-grid">
           ${cardImages.map(image => `
             <div class="bingo-cell">
               <img src="${image.src}" alt="${image.name}">
@@ -191,7 +193,7 @@ function getRandomImages(count) {
 // Funciones de descarga PDF simplificadas
 async function downloadCardsPDF() {
   if (document.getElementById('bingoCards').children.length === 0) {
-    showStatus('Primero debes generar las cartillas de bingo.', 'error');
+    showStatus('Primero debes generar las cartillas de bingo.', 'danger');
     return;
   }
 
@@ -228,13 +230,13 @@ async function downloadCardsPDF() {
 
   } catch (error) {
     console.error('Error al generar PDF:', error);
-    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'error');
+    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'danger');
   }
 }
 
 async function downloadImagesPDF() {
   if (usedImages.length === 0) {
-    showStatus('Primero debes generar las cartillas para obtener las imágenes.', 'error');
+    showStatus('Primero debes generar las cartillas para obtener las imágenes.', 'danger');
     return;
   }
 
@@ -271,13 +273,13 @@ async function downloadImagesPDF() {
 
   } catch (error) {
     console.error('Error al generar PDF:', error);
-    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'error');
+    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'danger');
   }
 }
 
 async function downloadAllPDF() {
   if (document.getElementById('bingoCards').children.length === 0) {
-    showStatus('Primero debes generar las cartillas de bingo.', 'error');
+    showStatus('Primero debes generar las cartillas de bingo.', 'danger');
     return;
   }
 
@@ -323,7 +325,7 @@ async function downloadAllPDF() {
 
   } catch (error) {
     console.error('Error al generar PDF:', error);
-    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'error');
+    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'danger');
   }
 }
 
