@@ -6,11 +6,24 @@
 body {
   margin: 0;
   font-family: sans-serif;
+  background: #F6FAFF;
+  color: #09090B;
+}
+
+.light-text {
+  color: #71717A;
+  margin-top: .5rem;
+  margin-bottom: 1rem;
 }
 
 .container {
   .header {
     padding: 1rem;
+  }
+
+  .content {
+    max-width: 860px;
+    margin: auto;
   }
 }
 
@@ -26,6 +39,8 @@ body {
   .image-item {
     aspect-ratio: 1 / 1;
     position: relative;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
 
     img {
       width: 100%;
@@ -44,7 +59,7 @@ body {
 /* THEME */
 .container {
   .header {
-    background: linear-gradient(#1948B0, #5645B9);
+    background: linear-gradient(90deg, #2562EB, #9333EA);
     color: aliceblue;
     text-align: center;
   }
@@ -89,27 +104,66 @@ body {
   border-color: #cbd5e1;
 }
 
+.dn-btn.green {
+  background: #1ba153;
+  color: white;
+}
+
+.dn-btn.green:hover {
+  background: #178f49;
+  color: white;
+}
+
+.dn-card {
+  padding: 1rem;
+  background: white;
+  box-shadow: 1px 0 5px 1px #0000000f;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dn-card-title {
+  margin: 0;
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.dn-flex {
+  display: flex;
+}
+
+.gap {
+  gap: .5rem;
+}
+
+.dn-form-item {
+  margin-bottom: 1rem;
+}
+
+.dn-form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.dn-form-control {
+  display: block;
+  height: 1.7rem;
+  min-width: 7rem;
+  border: 1px solid #ccd1d8;
+  border-radius: 6px;
+}
+
 /* SHEET LAYOUT */
 .sheet-container {
-  width: 100vw;
-  padding: 1rem;
-  overflow-x: auto;
+  display: flex;
+  justify-content: center;
 
   .sheet-a4 {
+    width: 150mm;
+  }
+
+  .sheet-a4-large {
     width: 210mm;
-    min-height: 297mm;
-    padding: 20mm;
-    margin: auto;
-  }
-
-  .page-break-before {
-    page-break-before: always;  /* Legacy support */
-    break-before: page;         /* Modern browsers */
-  }
-
-  .page-break-after {
-    page-break-after: always;
-    break-after: page;
   }
 }
 
@@ -124,9 +178,11 @@ body {
 
 
 /* BINGO LAYOUT */
+
 .bingo-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  gap: .25rem;
 
   .bingo-cell {
     aspect-ratio: 1 / 1;
@@ -141,21 +197,129 @@ body {
 }
 
 /* BINGO THEME */
+.bingo-card {
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 1rem;
+
+  background: linear-gradient(45deg, #b31d25, #f10303);
+
+  /* HEADER */
+  .bingo-header {
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bingo-headDeco {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1rem;
+  }
+
+  .bingo-title,
+  .bingo-subtitle {
+    color: white;
+  }
+
+  .bingo-title {
+    font-size: 3rem;
+    margin: 0;
+  }
+
+  .bingo-date {
+    background: white;
+    padding: .5rem 1rem;
+    color: #f10303;
+    text-transform: uppercase;
+    border-radius: 2rem;
+  }
+
+  /* BODY */
+  .bingo-body {
+    padding: 1.2rem;
+    background: white;
+    border-radius: .5rem;
+  }
+
+
+  /* FOOTER */
+  .bingo-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+
+    font-weight: bold;
+    color: #f10303;
+  }
+}
+
 .bingo-grid {
-  border: 1px solid black;
   border-radius: .5rem;
   overflow: hidden;
 
   .bingo-cell {
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
+    border-radius: .5rem;
+    border: 1px solid #f10303;
+    padding: .5rem;
+  }
+}
+
+.bingo-react {
+  width: 1rem;
+  height: .5rem;
+  border: 1px solid #f10303;
+  background: white;
+}
+
+.bingo-react.red {
+  background: #f10303;
+}
+
+.bingo-headDeco {
+  .bingo-react {
+    height: 1rem;
+    width: 2rem;
   }
 
-  .bingo-cell:nth-child(3n) {
-    border-right: none;
+  .bingo-react.red {
+    border-color: white;
+  }
+}
+
+
+
+.individual-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+
+  .individual-image {
+    aspect-ratio: 1 / 1;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}
+
+
+.dn-alert {
+  padding: .5rem;
+  border-radius: 6px;
+  margin-top: .5rem;
+
+  &.danger {
+    background: #ff000041;
+    color: #680c11;
   }
 
-  .bingo-cell:nth-last-child(-n+3) {
-    border-bottom: none;
+  &.success {
+    background: #118f1148;
+    color: #07411f;
   }
 }

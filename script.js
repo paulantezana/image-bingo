@@ -124,16 +124,34 @@ function generateBingoCards(rows, cols, numCards) {
     const cardImages = getRandomImages(rows * cols);
 
     // style="grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr);"
-    
+
     htmlContent += `
-      <div class="bingo-card">
-        <h3>BINGO - Cartilla ${cardNum}</h3>
-        <div class="bingo-grid">
-          ${cardImages.map(image => `
-            <div class="bingo-cell">
-              <img src="${image.src}" alt="${image.name}">
-            </div>
-          `).join('')}
+      <div class="bingo-card sheet-page">
+        <div class="bingo-header">
+          <div class="bingo-headDeco">
+            <div class="bingo-react"></div>
+            <div class="bingo-react red"></div>
+            <div class="bingo-react"></div>
+          </div>
+          <h3 class="bingo-title">BINGO</h3>
+          <p class="bingo-subtitle">FIESTAS PATRIAS PERÚ</p>
+          <div class="bingo-date">28 DE JULIO</div>
+        </div>
+        <div class="bingo-body">
+          <div class="bingo-grid">
+            ${cardImages.map(image => `
+              <div class="bingo-cell">
+                <img src="${image.src}" alt="${image.name}">
+              </div>
+            `).join('')}
+          </div>
+          <div class="bingo-footer">
+            <div class="bingo-react"></div>
+            <div class="bingo-react red"></div>
+            <p class="bingo-footTitle">¡VIVA EL PERÚ!</p>
+            <div class="bingo-react red"></div>
+            <div class="bingo-react"></div>
+          </div>
         </div>
       </div>
     `;
@@ -145,35 +163,17 @@ function generateBingoCards(rows, cols, numCards) {
 function generateIndividualImages(rows, cols) {
   const container = document.getElementById('individualImages');
 
-  // Usar todas las imágenes que aparecieron en las cartillas
-  const uniqueImages = [...new Set(usedImages)];
-  const cellsPerPage = rows * cols;
-  let htmlContent = '';
-
-  // Agrupar imágenes según las dimensiones de la cartilla
-  for (let i = 0; i < uniqueImages.length; i += cellsPerPage) {
-    const pageImages = uniqueImages.slice(i, i + cellsPerPage);
-
-    htmlContent += `
-      <div class="individual-images-page" style="grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr);">
-        ${pageImages.map((image, index) => `
+  let htmlContent = `
+      <div class="individual-images-grid">
+        ${usedImages.map((image, index) => `
           <div class="individual-image">
             <img src="${image.src}" alt="${image.name}">
-            <h4>Imagen ${i + index + 1}</h4>
           </div>
         `).join('')}
-        ${generateEmptyCells(cellsPerPage - pageImages.length)}
       </div>
     `;
-  }
 
   container.innerHTML = htmlContent;
-}
-
-function generateEmptyCells(count) {
-  return Array(count).fill().map(() =>
-    '<div class="individual-image" style="visibility: hidden;"></div>'
-  ).join('');
 }
 
 function getRandomImages(count) {
@@ -192,37 +192,30 @@ function getRandomImages(count) {
 
 // Funciones de descarga PDF simplificadas
 async function downloadCardsPDF() {
-  if (document.getElementById('bingoCards').children.length === 0) {
-    showStatus('Primero debes generar las cartillas de bingo.', 'danger');
-    return;
-  }
-
-  showStatus('Generando PDF de cartillas... Por favor espera.', 'success');
-
   try {
     const bingoSection = document.getElementById('bingoCards');
 
     const options = {
-      margin: 0,
-      filename: 'cartillas-bingo.pdf',
+      filename: 'bingo-cartilla.pdf',
       image: {
         type: 'jpeg',
         quality: 0.95
       },
       html2canvas: {
-        scale: 2,
+        scrollX: 0,
+        scrollY: 0,
         useCORS: true,
-        allowTaint: true,
+        scale: 2,
+        // allowTaint: true,
         backgroundColor: '#ffffff'
       },
-      jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait'
-      },
-      pagebreak: {
-        mode: ['avoid-all', 'css', 'legacy']
-      }
+
+      // Unidad de medida en milimetros
+      margin: 32,
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+
+      // Saltos de linea
+      pagebreak: { mode: 'css', after: '.sheet-page:not(:last-child)' }
     };
 
     await html2pdf().set(options).from(bingoSection).save();
@@ -235,37 +228,30 @@ async function downloadCardsPDF() {
 }
 
 async function downloadImagesPDF() {
-  if (usedImages.length === 0) {
-    showStatus('Primero debes generar las cartillas para obtener las imágenes.', 'danger');
-    return;
-  }
-
-  showStatus('Generando PDF de imágenes... Por favor espera.', 'success');
-
   try {
     const imagesSection = document.getElementById('individualImages');
 
     const options = {
-      margin: 0,
-      filename: 'imagenes-bingo.pdf',
+      filename: 'bingo-imagenes.pdf',
       image: {
         type: 'jpeg',
         quality: 0.95
       },
       html2canvas: {
-        scale: 2,
+        scrollX: 0,
+        scrollY: 0,
         useCORS: true,
-        allowTaint: true,
+        scale: 2,
+        // allowTaint: true,
         backgroundColor: '#ffffff'
       },
-      jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait'
-      },
-      pagebreak: {
-        mode: ['avoid-all', 'css', 'legacy']
-      }
+
+      // Unidad de medida en milimetros
+      margin: 12.7,
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+
+      // Saltos de linea
+      // pagebreak: { mode: 'css', after: '.sheet-page:not(:last-child)' }
     };
 
     await html2pdf().set(options).from(imagesSection).save();
@@ -285,48 +271,8 @@ async function downloadAllPDF() {
 
   showStatus('Generando PDF completo... Por favor espera.', 'success');
 
-  try {
-    // Crear contenedor temporal que combine ambas secciones
-    const combinedContainer = document.createElement('div');
-
-    // Clonar las cartillas
-    const bingoCards = document.getElementById('bingoCards').cloneNode(true);
-    combinedContainer.appendChild(bingoCards);
-
-    // Clonar las imágenes individuales
-    const individualImages = document.getElementById('individualImages').cloneNode(true);
-    combinedContainer.appendChild(individualImages);
-
-    const options = {
-      margin: 0,
-      filename: 'bingo-completo.pdf',
-      image: {
-        type: 'jpeg',
-        quality: 0.95
-      },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      },
-      jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait'
-      },
-      pagebreak: {
-        mode: ['avoid-all', 'css', 'legacy']
-      }
-    };
-
-    await html2pdf().set(options).from(combinedContainer).save();
-    showStatus('¡PDF completo descargado exitosamente!', 'success');
-
-  } catch (error) {
-    console.error('Error al generar PDF:', error);
-    showStatus('Error al generar el PDF. Por favor intenta de nuevo.', 'danger');
-  }
+  downloadCardsPDF();
+  downloadImagesPDF();
 }
 
 function clearAll() {

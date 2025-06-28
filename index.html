@@ -22,6 +22,7 @@
       <div class="dn-card">
         <div class="dn-card-body">
           <h2 class="dn-card-title">📸 Subir Imágenes</h2>
+          <div class="light-text">Selecciona las imágenes que quieres usar en tus cartillas de bingo</div>
           <div class="upload-area" onclick="document.getElementById('imageInput').click()">
             <div class="upload-text">
               Haz clic aquí o arrastra imágenes para subirlas<br>
@@ -40,6 +41,7 @@
       <div class="dn-card dn-mt-2">
         <div class="dn-card-body">
           <h2 class="dn-card-title">⚙️ Configuración</h2>
+          <div class="light-text">Personaliza el tamaño y cantidad de cartillas a generar</div>
           <div class="dn-flex gap">
             <div class="dn-form-item">
               <label for="gridRows" class="dn-form-label">Filas:</label>
@@ -75,68 +77,31 @@
           </div>
 
           <div class="dn-flex gap">
-            <button class="dn-btn lg primary" onclick="generateBingo()">🎯 Generar Cartillas</button>
-            <button class="dn-btn lg danger" onclick="clearAll()">🗑️ Limpiar Todo</button>
-            <button class="dn-btn lg" onclick="downloadCardsPDF()">📄 Descargar Cartillas PDF</button>
-            <button class="dn-btn lg" onclick="downloadImagesPDF()">🖼️ Descargar Imágenes PDF</button>
-            <button class="dn-btn lg" onclick="downloadAllPDF()">📋 Descargar Todo PDF</button>
+            <button class="dn-btn green" onclick="generateBingo()">Generar Cartillas</button>
+            <button class="dn-btn danger" onclick="clearAll()">Limpiar Todo</button>
+            <button class="dn-btn" onclick="downloadAllPDF()">Descargar PDF</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Cartillas generadas -->
-      <div class="section print-section bingo-section" id="bingoSection" style="display: none;">
-        <h2>🎲 Cartillas de Bingo</h2>
-        <div class="sheet-container">
-          <div id="bingoCards" class="sheet-a4"></div>
-        </div>
+    <!-- Cartillas generadas -->
+    <div class="section print-section bingo-section" id="bingoSection" style="display: none;">
+      <h2>🎲 Cartillas de Bingo</h2>
+      <div class="sheet-container">
+        <div id="bingoCards" class="sheet-a4"></div>
       </div>
+    </div>
 
-      <!-- Imágenes individuales -->
-      <div class="section print-section individual-section" id="individualSection" style="display: none;">
-        <h2>🖼️ Imágenes Individuales</h2>
-        <div id="individualImages" class="individual-images"></div>
+    <!-- Imágenes individuales -->
+    <div class="section print-section individual-section" id="individualSection" style="display: none;">
+      <h2>🖼️ Imágenes Individuales</h2>
+      <div class="sheet-container">
+        <div id="individualImages" class="sheet-a4-large"></div>
       </div>
     </div>
   </div>
   <script src="script.js"></script>
-
-  <button onclick="generatePDF()">IMPRIMIR</button>
-
-  <div class="sheet-container">
-    <div class="sheet-a4" id="pdf-content-test">
-      <div class="page-break-before">
-        <h2>This will start on a new page</h2>
-      </div>
-
-      <div>
-        <p>This content ends normally...</p>
-      </div>
-
-      <div class="page-break-after">
-        <p>This block will force a page break after it.</p>
-      </div>
-
-      <div>
-        <p>This content will be on a new page because of the break above.</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function generatePDF() {
-      const element = document.getElementById('pdf-content-test');
-      const opt = {
-        margin: 0,
-        filename: 'document.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }
-  </script>
-
 
 </body>
 
