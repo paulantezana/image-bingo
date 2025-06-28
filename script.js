@@ -20,6 +20,11 @@ function handleDragLeave(e) {
   uploadArea.classList.remove('dragover');
 }
 
+function updateCounterImage() {
+  const element = document.getElementById('CounterImage');
+  element.textContent = `${uploadedImages.length} imagen(es).`;
+}
+
 function handleDrop(e) {
   e.preventDefault();
   uploadArea.classList.remove('dragover');
@@ -50,6 +55,7 @@ function processFiles(files) {
       uploadedImages.push(imageData);
       updateImagePreview();
       showStatus(`${uploadedImages.length} imagen(es) subida(s) correctamente.`, 'success');
+      updateCounterImage();
     };
     reader.readAsDataURL(file);
   });
@@ -72,14 +78,57 @@ function removeImage(index) {
   uploadedImages.splice(index, 1);
   updateImagePreview();
   showStatus(`Imagen eliminada. ${uploadedImages.length} imagen(es) restante(s).`, 'success');
+  updateCounterImage();
 }
+
+function setLoading(loading = true) {
+  const existingOverlay = document.getElementById('loading-overlay');
+
+  if (loading) {
+    // Si ya existe, no lo agregues de nuevo
+    if (existingOverlay) return;
+
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    overlay.innerHTML = `<div class="loading-text">Cargando...</div>`;
+
+    // Estilos CSS
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.backdropFilter = 'blur(3px)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '9999';
+
+    // Estilos del texto
+    const text = overlay.querySelector('.loading-text');
+    text.style.color = 'white';
+    text.style.fontSize = '1rem';
+    text.style.fontFamily = 'Arial, sans-serif';
+
+    // Agregar al body
+    document.body.appendChild(overlay);
+  } else {
+    // Eliminar si existe
+    if (existingOverlay) {
+      existingOverlay.remove();
+    }
+  }
+}
+
 
 function showStatus(message, type = 'success') {
   const status = document.getElementById('imageStatus');
   status.innerHTML = `<div class="dn-alert ${type === 'danger' ? 'danger' : 'success'}">${message}</div>`;
   setTimeout(() => {
     status.innerHTML = '';
-  }, 3000);
+  }, 5000);
 }
 
 function generateBingo() {
@@ -99,19 +148,26 @@ function generateBingo() {
   }
 
   // Generar cartillas listas para impresión
-  generateBingoCards(rows, cols, numCards);
+  setLoading(true);
+  try {
+    generateBingoCards(rows, cols, numCards);
 
-  // Generar imágenes individuales listas para impresión
-  generateIndividualImages(rows, cols);
+    // Generar imágenes individuales listas para impresión
+    generateIndividualImages(rows, cols);
 
-  // Mostrar secciones
-  document.getElementById('bingoSection').style.display = 'block';
-  document.getElementById('individualSection').style.display = 'block';
+    // Mostrar secciones
+    document.getElementById('bingoSection').style.display = 'block';
+    document.getElementById('individualSection').style.display = 'block';
 
-  // Hacer scroll hacia las cartillas
-  document.getElementById('bingoSection').scrollIntoView({ behavior: 'smooth' });
+    // Hacer scroll hacia las cartillas
+    document.getElementById('bingoSection').scrollIntoView({ behavior: 'smooth' });
 
-  showStatus(`¡${numCards} cartilla(s) de bingo generada(s) exitosamente!`, 'success');
+    showStatus(`¡${numCards} cartilla(s) de bingo generada(s) exitosamente!`, 'success');
+  } catch (err) {
+
+  } finally {
+    setLoading(false);
+  }
 }
 
 function generateBingoCards(rows, cols, numCards) {
@@ -271,8 +327,16 @@ async function downloadAllPDF() {
 
   showStatus('Generando PDF completo... Por favor espera.', 'success');
 
-  downloadCardsPDF();
-  downloadImagesPDF();
+  setLoading(true);
+
+  try {
+    await downloadCardsPDF();
+    await downloadImagesPDF();
+  } catch (err) {
+
+  } finally {
+    setLoading(false);
+  }
 }
 
 function clearAll() {

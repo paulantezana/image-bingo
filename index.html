@@ -31,7 +31,7 @@
             <button type="button" class="dn-btn">Seleccionar Imágenes</button>
           </div>
           <input type="file" id="imageInput" multiple accept="image/*">
-
+          <div class="dn-alert" id="CounterImage">0 imagen(es).</div>
           <div id="imagesPreview" class="images-preview"></div>
           <div id="imageStatus"></div>
         </div>
@@ -46,9 +46,9 @@
             <div class="dn-form-item">
               <label for="gridRows" class="dn-form-label">Filas:</label>
               <select id="gridRows" class="dn-form-control">
-                <option value="3">3</option>
+                <option value="3" selected>3</option>
                 <option value="4">4</option>
-                <option value="5" selected>5</option>
+                <option value="5">5</option>
                 <option value="6">6</option>
               </select>
             </div>
@@ -56,9 +56,9 @@
             <div class="dn-form-item">
               <label for="gridCols" class="dn-form-label">Columnas:</label>
               <select id="gridCols" class="dn-form-control">
-                <option value="3">3</option>
+                <option value="3" selected>3</option>
                 <option value="4">4</option>
-                <option value="5" selected>5</option>
+                <option value="5">5</option>
                 <option value="6">6</option>
               </select>
             </div>
