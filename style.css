@@ -181,7 +181,7 @@ body {
 
 .bingo-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  /* grid-template-columns: 1fr 1fr 1fr; JAVASCRIPT */
   gap: .25rem;
 
   .bingo-cell {

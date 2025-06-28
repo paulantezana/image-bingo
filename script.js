@@ -194,7 +194,7 @@ function generateBingoCards(rows, cols, numCards) {
           <div class="bingo-date">28 DE JULIO</div>
         </div>
         <div class="bingo-body">
-          <div class="bingo-grid">
+          <div class="bingo-grid" style="grid-template-columns: repeat(${cols}, 1fr);">
             ${cardImages.map(image => `
               <div class="bingo-cell">
                 <img src="${image.src}" alt="${image.name}">
