@@ -27,7 +27,7 @@
               Haz clic aquí o arrastra imágenes para subirlas<br>
               <small>Soporta: JPG, PNG, GIF, WEBP</small>
             </div>
-            <button type="button" class="btn">Seleccionar Imágenes</button>
+            <button type="button" class="dn-btn">Seleccionar Imágenes</button>
           </div>
           <input type="file" id="imageInput" multiple accept="image/*">
 
@@ -100,6 +100,42 @@
     </div>
   </div>
   <script src="script.js"></script>
+
+  <button onclick="generatePDF()">IMPRIMIR</button>
+
+  <div class="sheet-container">
+    <div class="sheet-a4" id="pdf-content-test">
+      <div class="page-break-before">
+        <h2>This will start on a new page</h2>
+      </div>
+
+      <div>
+        <p>This content ends normally...</p>
+      </div>
+
+      <div class="page-break-after">
+        <p>This block will force a page break after it.</p>
+      </div>
+
+      <div>
+        <p>This content will be on a new page because of the break above.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generatePDF() {
+      const element = document.getElementById('pdf-content-test');
+      const opt = {
+        margin: 0,
+        filename: 'document.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
 
 
 </body>
