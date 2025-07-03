@@ -197,7 +197,8 @@ function generateBingoCards(rows, cols, numCards) {
           <div class="bingo-grid" style="grid-template-columns: repeat(${cols}, 1fr);">
             ${cardImages.map(image => `
               <div class="bingo-cell">
-                <img src="${image.src}" alt="${image.name}">
+                <img src="${image.src}" alt="${image.name}"/>
+                <div class="bingo-cell-description">${geFileName(image.name)}</div>
               </div>
             `).join('')}
           </div>
@@ -216,6 +217,15 @@ function generateBingoCards(rows, cols, numCards) {
   container.innerHTML = htmlContent;
 }
 
+function geFileName(name){
+   let newName = name?.replace(/\.[^/.]+$/, "") ?? name;              // Quitar extensión
+   newName = newName.replace(/\s+/g, ' ');                            // Reemplazar múltiples espacios por uno
+   newName = newName.trim();                                         // Quitar espacios al inicio y final
+   newName = newName.toLowerCase();                                  // Convertir todo a minúsculas
+   newName = newName.replace(/(?:^|\s)\S/g, c => c.toUpperCase());   // Capitalizar cada palabra
+   return newName;
+}
+
 function generateIndividualImages(rows, cols) {
   const container = document.getElementById('individualImages');
 
@@ -224,6 +234,7 @@ function generateIndividualImages(rows, cols) {
         ${usedImages.map((image, index) => `
           <div class="individual-image">
             <img src="${image.src}" alt="${image.name}">
+            <div class="individual-image-description">${geFileName(image.name)}</div>
           </div>
         `).join('')}
       </div>

@@ -186,12 +186,20 @@ body {
 
   .bingo-cell {
     aspect-ratio: 1 / 1;
+    position: relative;
 
     img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
+    }
+
+    .bingo-cell-description {
+      position: absolute;
+      bottom: .2rem;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
 }
@@ -263,7 +271,12 @@ body {
   .bingo-cell {
     border-radius: .5rem;
     border: 1px solid #f10303;
-    padding: .5rem;
+    padding: .5rem .5rem 2rem;
+
+    .bingo-cell-description {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
   }
 }
 
@@ -297,6 +310,8 @@ body {
 
   .individual-image {
     aspect-ratio: 1 / 1;
+    position: relative;
+    padding: 0 0 2rem;
 
     img {
       display: block;
@@ -304,9 +319,18 @@ body {
       height: 100%;
       object-fit: contain;
     }
+
+    .individual-image-description {
+      position: absolute;
+      bottom: .2rem;
+      left: 50%;
+      transform: translateX(-50%);
+
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
   }
 }
-
 
 .dn-alert {
   padding: .5rem;
